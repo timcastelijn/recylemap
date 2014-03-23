@@ -1,0 +1,36 @@
+<style>
+  .marker-image {
+	width:100px;
+	height:100px;
+	border:1px solid #FF0044;
+	margin-left:-51px;
+	margin-top:-51px;
+	pointer-events:all;
+	position:absolute;
+  }
+  body { margin:0; padding:0; }
+  a:link, a:visited, a:active, a:hover {
+			color:#FF0044;
+			font-family: sans-serif; 
+			text-decoration:underline; 
+			padding:5px; }
+a:hover {color:#CCC;}  /* mouse over link */
+p {color:#F03}
+#label {
+  position:absolute;
+  top:20px;
+  left:20px;
+  width:150px;
+  z-index:1000;
+  font:10px;
+  font-family:sans-serif;
+  color:#F03;
+  text-align:center;
+  padding:10px;
+	  background:#FFF;
+	  color:#3C4E5A;
+}
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+  #geolocate{background-color: #DDD;}
+
+</style>

@@ -7,8 +7,8 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
  
-  <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' />
-
+  <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' ></link>
+  <link href='stylesheet.css' rel='stylesheet'></link>
   <style>
     .marker-image {
     width:100px;
@@ -19,31 +19,6 @@
     pointer-events:all;
     position:absolute;
 	}
-    body { margin:0; padding:0; }
-    a:link, a:visited, a:active, a:hover {
-				color:#FF0044;
-				font-family: sans-serif; 
-				text-decoration:underline; 
-				padding:5px; }
-	a:hover {color:#CCC;}  /* mouse over link */
-	p {color:#F03}
-	#label {
-	  position:absolute;
-	  top:20px;
-	  left:20px;
-	  width:150px;
-	  z-index:1000;
-	  font:10px;
-	  font-family:sans-serif;
-	  color:#F03;
-	  text-align:center;
-	  padding:10px;
-  	  background:#FFF;
-  	  color:#3C4E5A;
-	}
-    #map { position:absolute; top:0; bottom:0; width:100%; }
-    #geolocate{background-color: #DDD;}
-
   </style>
 </head>
 <body>
@@ -85,7 +60,7 @@ window.jsonFlickrApi = function(rsp) {
     
 	function get_entries(callback){
 		var features =[];
-		var j=0;
+
 		for (var i = 0; i < photos.length; i++) {
 		  // function to make a copy of i as it will always be the last at time of the callbacl
 		  (function (i_copy) {
@@ -103,7 +78,15 @@ window.jsonFlickrApi = function(rsp) {
 			
 			// get photo info and store as map feature			
 			$.get( url2, function(data){
-				features.push({"geometry":{
+				$.get( "http://api.tiles.mapbox.com/v3/examples.map-zr0njcqy/geocode/"+ p.longitude+ ","+p.latitude +".json", function(data2){
+					console.log(data2.results[0]);
+					
+					var street = data2.results[0][0].name
+					var city = data2.results[0][1].name
+
+					
+					
+					features.push({"geometry":{
 		        					"type": "Point", 
 		        					"coordinates": [p.longitude, p.latitude]
 								},
@@ -111,16 +94,14 @@ window.jsonFlickrApi = function(rsp) {
 		        					"img": thumb, 
 		        					"image": url, 
 		        					"name":p.title, 
-		        					"description": data.photo.description._content
+		        					"description": data.photo.description._content,
+									"address":street + ", "+ city
 								}
 		        			});
 				
-				//at the end of the call the callback and pass the result	
-				if(j == photos.length-1){
+					
 					callback(features);
-				}	
-				j = j +1
-								
+				});
 			});				
 		  })(i)	
 		}
@@ -128,10 +109,6 @@ window.jsonFlickrApi = function(rsp) {
 	
 	//add markers to map
 	get_entries(function(features){
-						
-		for(i=0; i<features.length;i++){
-			console.log( features[i].properties.image);
-		}
 						
 			var markers = mapbox.markers.layer().features(features).factory(function(f) {
 		    // Define a new factory function. This takes a GeoJSON object
@@ -156,7 +133,9 @@ window.jsonFlickrApi = function(rsp) {
 			        '<img src="' + feature.properties.image + '">' +
 			        '<p>' + feature.properties.name + '</p>' +
 			        '</a>' +
-			        '<p>' + feature.properties.description +'</p>';
+			        '<p>' + feature.properties.description +'</p>'+
+			        '<p>' + feature.properties.address +'</p>';
+					
 			    return o;
 			});
 	});
