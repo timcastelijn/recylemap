@@ -1,0 +1,42 @@
+{ "type": "feature collection",
+  "features":[
+  {
+	"geometry": { "type": "Point", "coordinates": [5.123699,52.071039]},
+	"properties": {
+	    "image": "https://lh4.googleusercontent.com/-YDA7Borc-K8/S2vU_zk9GKI/AAAAAAAAAQ0/4rn5myADmdE/s912/pavello.jpg",
+	    "url": "http://timcastelijn.nl",
+	    "name": "pavello",
+	    "description": "paviljoentje voor hergebruik"
+	}
+}, {
+	"geometry": { "type": "Point", "coordinates": [5.117997,52.085776]},
+    "properties": {
+        "image": "http://farm9.staticflickr.com/8363/8376204495_61d75a7f10.jpg",
+        "url": "http://timcastelijn.nl",
+        "name": "hout en bank",
+        "description": "houten bedframe en puntgave tweezitter",
+        "marker-color": "#f44",
+        "marker-size": "large"
+    }
+}, {
+	"geometry": { "type": "Point", "coordinates": [5.08, 52.08]},
+    "properties": {
+        "image": "http://1.bp.blogspot.com/_aq9-5vIIz5s/TNbBtAJLaJI/AAAAAAAAANs/92_6emkfm8s/s1600/hout.jpg",
+        "url": "http://timcastelijn.nl",
+        "name": "boomstammen",
+        "description": "30 stammetjes van ca 1m lang",
+        "marker-color": "#f44",
+        "marker-size": "large"
+    }
+}, {
+	"geometry": { "type": "Point", "coordinates": [5.12, 52.11]},
+    "properties": {
+        "image": "http://www.deouderust.nl/wp-content/uploads/2011/09/kast-%E2%82%AC2200-.jpg",
+        "url": "http://timcastelijn.nl",
+        "name": "oude kast",
+        "description": "kast, uit hardhout onderdelen",
+        "marker-color": "#f44",
+        "marker-size": "large"
+    }
+}]
+}

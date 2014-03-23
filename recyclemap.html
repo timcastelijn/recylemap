@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />	
+  <script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'></script>
+  <script src='https://raw.github.com/timrwood/moment/1.7.2/min/moment.min.js'></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+  <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' />
+
+  <style>
+    .marker-image {
+    width:100px;
+    height:100px;
+    border:1px solid #FF0044;
+    margin-left:-51px;
+    margin-top:-51px;
+    pointer-events:all;
+    position:absolute;
+	}
+    body { margin:0; padding:0; }
+    a:link, a:visited, a:active, a:hover {
+				color:#FF0044;
+				font-family: sans-serif; 
+				text-decoration:underline; 
+				padding:5px; }
+	a:hover {color:#CCC;}  /* mouse over link */
+	p {color:#F03}
+	#label {
+	  position:absolute;
+	  top:20px;
+	  left:20px;
+	  width:150px;
+	  z-index:1000;
+	  font:10px;
+	  font-family:sans-serif;
+	  color:#F03;
+	  text-align:center;
+	  padding:10px;
+  	  background:#FFF;
+  	  color:#3C4E5A;
+	}
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    #geolocate{background-color: #DDD;}
+
+  </style>
+</head>
+<body>
+<div id='map'>
+	<div id='label'>
+		<p>Recyclemap - by TIMCASTELIJN</p>
+		<p>Share locations of and information about re-usable material in your street</p>
+		<p>Listings are added by uploading geotagged picture to flickr.com</p>
+		<a href='#' id='geolocate'>GEO LOCATION</a>
+		<p>back to:</p>
+		<p><a href = "http://timcastelijn.nl">timcastelijn.nl</a></p>
+	</div>
+</div>
+</body>	
+
+<script>
+
+
+
+
+//initialize map
+var map = mapbox.map('map');
+map.addLayer(mapbox.layer().id('timcastelijn.map-js7ghzbm'));
+map.zoom(12).center({ lat: 52.1, lon: 5.07 });
+
+
+//zoom function
+//map.ui.zoomer.add();
+
+
+var features = [];
+var number;
+
+window.jsonFlickrApi = function(rsp) {
+
+    var photos = rsp.photos.photo;
+    for (var i = 0; i < photos.length; i++) {
+        var p = photos[i];
+        
+        var thumb = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_s.jpg' ].join('');            
+        var url = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_m.jpg' ].join('');    
+        var id = p.id;
+        
+        //http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&id=8447950504&format=json
+
+        
+        features.push({"geometry":{
+        				"type": "Point", 
+        				"coordinates": [p.longitude, p.latitude]},
+        			"properties":{
+        				"img": thumb, 
+        				"image": url, 
+        				"name":p.title, 
+        				"description": "description"}
+        			});
+    }
+
+	
+
+	var stringJson = JSON.stringify(features);
+	
+	var markers = mapbox.markers.layer().features(features).factory(function(f) {
+    // Define a new factory function. This takes a GeoJSON object
+    // as its input and returns an element - in this case an image -
+    // that represents the point.
+        var img = document.createElement('img');
+        img.className = 'marker-image';
+        img.setAttribute('src', f.properties.img);
+        return img;
+    });
+    //*/
+    
+	var interaction = mapbox.markers.interaction(markers);
+	mapbox.markers.interaction(markers);
+	
+	function intialize()
+	{
+	    number = photos.length;
+	    return number;
+	}
+
+	map.addLayer(markers);
+      	  
+
+	/* this makes the map zoom to
+	if (photos.length>0)
+	  {
+	     map.addLayer(markers)
+      	  .setExtent(markers.extent());
+      	  if(photos.length<2){map.zoom(12);}
+        
+	  }
+	else
+		{
+			map.zoom(12).center({ lat: 52.1, lon: 5.07 });
+		}
+ 	*/
+	// Set a custom formatter for tooltips
+	// Provide a function that returns html to be used in tooltip
+	interaction.formatter(function(feature) {
+	    var o = '<a target="_blank" href="' + feature.properties.image + '">' +
+	        '<img src="' + feature.properties.image + '">' +
+	        '<p>' + feature.properties.name + '</p>' +
+	        '</a>' +
+	        '<p>' + feature.properties.description +'</p>';
+	    return o;
+	});
+
+
+
+}
+
+
+
+/*
+function httpGet(theUrl)
+    {
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+var stringJson = httpGet('http://api.flickr.com/services/rest/?'+
+               'method=flickr.photos.search&'+
+               'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
+               'user_id=92325211@N08&'+ 
+               'min_upload_date='+ date +'&'+
+               //'tags=clouds&'+
+               'extras=geo&' +
+               'has_geo=1&'+
+               'format=json')
+console.log(stringJson);
+*/
+
+var date = moment().subtract('days', 3).format('YYYY-MM-DD');
+//moment().subtract('days', 10).calendar();
+
+console.log(date);
+
+var script = document.createElement('script');
+script.src = 'http://api.flickr.com/services/rest/?'+
+               'method=flickr.photos.search&'+
+               'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
+               'user_id=92325211@N08&'+ 
+               //'min_upload_date='+ date +'&'+
+               //'tags=clouds&'+
+               'extras=geo&' +
+               'has_geo=1&'+
+               'format=json';
+document.getElementsByTagName('head')[0].appendChild(script);
+
+
+//http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&user_id=92325211@N08&extras=geo&has_geo=1&format=json
+
+
+  var geolocate = document.getElementById('geolocate');
+
+  // This uses the HTML5 geolocation API, which is available on
+  // most mobile browsers and modern browsers, but not in Internet Explorer
+  //
+  // See this chart of compatibility for details:
+  // http://caniuse.com/#feat=geolocation
+  if (!navigator.geolocation) {
+      geolocate.innerHTML = 'geolocation is not available';
+  } else {
+      geolocate.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          navigator.geolocation.getCurrentPosition(
+          function(position) {
+              // Once we've got a position, zoom and center the map
+              // on it, add ad a single feature
+              map.zoom(16).center({
+                  lat: position.coords.latitude,
+                  lon: position.coords.longitude
+              });
+              markers.add_feature({
+                  geometry: {
+                      coordinates: [
+                          position.coords.longitude,
+                          position.coords.latitude]
+                  },
+                  properties: {
+                      'marker-color': '#000',
+                      'marker-symbol': 'star-stroked',
+                  }
+              });
+              // And hide the geolocation button
+              geolocate.parentNode.removeChild(geolocate);
+          },
+          function(err) {
+              // If the user chooses not to allow their location
+              // to be shared, display an error message.
+              geolocate.innerHTML = 'position could not be found';
+          });
+      };
+}
+
+
+
+
+
+// Attribute map
+map.ui.attribution.add()
+    .content('<a href="http://mapbox.com/about/maps">Terms &amp; Feedback</a>');
+</script>
+
+</body>
+</html>
+

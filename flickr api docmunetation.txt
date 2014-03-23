@@ -1,0 +1,35 @@
+ Key:
+447262cd07733c07c91a4fcf4d5ca658
+
+Secret:
+e2bfc30fd63d025a 
+
+
+signature string
+e2bfc30fd63d025aapi_key447262cd07733c07c91a4fcf4d5ca658permswrite
+
+api-sig (md5 sum sig strin)
+ee06a6f52ab90fbc056279517f00979b
+
+web url
+http://www.flickr.com/services/auth/?api_key=447262cd07733c07c91a4fcf4d5ca658&perms=write&api_sig=ee06a6f52ab90fbc056279517f00979b
+
+frob
+72157632724189651-b4bc327df742ee60-92232398
+
+after method flickr.auth.getToken
+<?xml version="1.0" encoding="utf-8" ?>
+<rsp stat="ok">
+  <auth>
+    <token>72157632724189649-5dc1d96f4d5a9264</token>
+    <perms>write</perms>
+    <user nsid="92325211@N08" username="YCLQ7WLV" fullname="" />
+  </auth>
+</rsp>
+
+e2bfc30fd63d025aapi_key 447262cd07733c07c91a4fcf4d5ca658auth_token72157632724189649-5dc1d96f4d5a9264methodflickr.photos.getInfo
+
+md5sum
+833b5398cf9694e2ed2eb45d9a3223fc
+
+http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&id=8447950504&format=json&api_sig=833b5398cf9694e2ed2eb45d9a3223fc

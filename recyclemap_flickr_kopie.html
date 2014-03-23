@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />	
+  <script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+  <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+        .marker-popup {
+          marker-color:#FFF;
+		  position:relative;
+		  left:-50%;
+		  max-width:400px;
+		  background:#FFFFFF;
+		  border:0px solid #ccc;
+		  color:#888;
+		  padding:20px;
+		  -webkit-user-select:auto;
+		     -moz-user-select:auto;
+		          user-select:auto;
+		  -webkit-box-shadow: 2px 2px 5px -2px #ccc;
+		          box-shadow: 2px 2px 5px -2px #ccc;
+		  -webkit-border-radius:3px;
+		          border-radius:3px;
+		  }
+		.zoomer {
+		  }
+	a:link, a:visited, a:active, a:hover {
+				color:#888;
+				font-family: sans-serif; 
+				text-decoration:none;}
+	a:hover {color:#CCC;}  /* mouse over link */
+	#label {
+  
+	  position:absolute;
+	  top:80px;
+	  left:90px;
+	  width:158px;
+	  margin-left:-80px;
+	  z-index:1000;
+	  font:13px/18px;
+	  font-family:sans-serif;
+	  color:#F03;
+	  text-align:center;
+	  /*padding:10px 0;
+	  background:#FFF;
+	  color:#3C4E5A;
+	  border:1px solid #BBB;*/
+	  }
+	
+	
+	#geolocate {
+	  background:#FFF;
+	  position:absolute;
+	  BOTTOM:80px;
+	  left:90px;
+	  width:158px;
+	  margin-left:-80px;
+	  z-index:1000;
+	  font:13px/18px;
+	  text-align:center;
+	  padding:10px 0;
+	  background:#FFF;
+	  color:#3C4E5A;
+	  display:block;
+	  border:1px solid #BBB;
+	  -webkit-border-radius:3px;
+	          border-radius:3px;
+	  }
+	  #geolocate:hover { background:#ECF5FA; }
+  </style>
+</head>
+<body>
+    
+<body>
+<!--<h1>timcastelijn_materialmap</h1>-->
+<div id='map'>
+		<a href='#' id='geolocate'>GEO Location</a>
+		<div id='label'>TIMCASTELIJN made this  (on purpose..)
+		<p>if you want to add your own listing; send me an email</p>
+		<p><a href = "http://timcastelijn.nl" style="color:#F03"}>back to timcastelijn.nl</a></p>
+</div>
+</body>	
+
+<script>
+
+var features = {};
+var edited = "{";
+
+
+
+window.jsonFlickrApi = function(rsp) {
+
+    var photos = rsp.photos.photo;
+    for (var i = 0; i < photos.length; i++) {
+        var p = photos[i];
+        features.geometry = [];
+		features.geometry.type = "Point" 
+		features.geometry.coordinates = [ p.latitude , p.longitude ];
+        var url = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_s.jpg' ].join('');    
+        var html = "<" + "img src='" + url + "'" + ">"; // weird for 'eval', sorry
+        features.properties = [];
+        features.properties.image = url;
+        features.properties.name = p.title;
+        features.properties.description = p.title;
+		
+		//"geometry": { "type": "Point", "coordinates": [-74.00, 40]},
+        //"properties": { "image": "http://placehold.it/100x100" }
+		
+		edited += 	'{'+
+					'"geometry": { "type" : "Point", "coordinates": ['+ p.longitude +','+ p.latitude +']},'+
+					'"properties": { "image":"' + url + '", "name":"'+ p.title + '", "desciption":"'+ p.title +'"}'+
+					'},';
+		
+
+
+
+    }
+    
+   	edited = edited.slice(0, -1);
+	edited += "}";  
+    
+    //console.debug(edited)
+    
+}
+
+console.debug(edited)
+console.debug(features)
+
+
+//initialize map
+var map = mapbox.map('map');
+map.addLayer(mapbox.layer().id('timcastelijn.map-js7ghzbm'));
+
+//zoom function
+map.ui.zoomer.add();
+// Zoom and center the map
+map.zoom(12).center({ lat: 52.1, lon: 5.07 });
+
+/*
+//add marker layer to map
+var markers = mapbox.markers.layer().url(features);
+var interaction = mapbox.markers.interaction(markers);
+mapbox.markers.interaction(markers);
+map.addLayer(markers)
+
+
+// Set a custom formatter for tooltips
+// Provide a function that returns html to be used in tooltip
+interaction.formatter(function(feature) {
+    var o = '<a target="_blank" href="' + feature.properties.url + '">' +
+        '<img src="' + feature.properties.image + '"  width="300">' +
+        '<h2>' + feature.properties.name + '</h2>' +
+        '</a>' +
+        '<p>' + feature.properties.description +'</p>';
+    return o;
+});
+
+*/
+
+var script = document.createElement('script');
+script.src = 'http://api.flickr.com/services/rest/?'+
+               'method=flickr.photos.search&'+
+               'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
+               'user_id=92325211@N08&'+ 
+               //'tags=clouds&'+
+               'extras=geo&' +
+               'has_geo=1&'+
+               'format=json';
+document.getElementsByTagName('head')[0].appendChild(script);
+
+
+//a08b5f6454d8e7c77c2fd5f75cf4b72e
+//4ecc84401f8749b7 
+
+
+console.debug(edited)
+
+
+  var geolocate = document.getElementById('geolocate');
+
+  // This uses the HTML5 geolocation API, which is available on
+  // most mobile browsers and modern browsers, but not in Internet Explorer
+  //
+  // See this chart of compatibility for details:
+  // http://caniuse.com/#feat=geolocation
+  if (!navigator.geolocation) {
+      geolocate.innerHTML = 'geolocation is not available';
+  } else {
+      geolocate.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          navigator.geolocation.getCurrentPosition(
+          function(position) {
+              // Once we've got a position, zoom and center the map
+              // on it, add ad a single feature
+              map.zoom(16).center({
+                  lat: position.coords.latitude,
+                  lon: position.coords.longitude
+              });
+              markers.add_feature({
+                  geometry: {
+                      coordinates: [
+                          position.coords.longitude,
+                          position.coords.latitude]
+                  },
+                  properties: {
+                      'marker-color': '#000',
+                      'marker-symbol': 'star-stroked',
+                  }
+              });
+              // And hide the geolocation button
+              geolocate.parentNode.removeChild(geolocate);
+          },
+          function(err) {
+              // If the user chooses not to allow their location
+              // to be shared, display an error message.
+              geolocate.innerHTML = 'position could not be found';
+          });
+      };
+}
+
+
+
+
+
+
+// Attribute map
+map.ui.attribution.add()
+    .content('<a href="http://mapbox.com/about/maps">Terms &amp; Feedback</a>');
+</script>
+
+</body>
+</html>
+
