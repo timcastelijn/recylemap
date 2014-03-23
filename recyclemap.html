@@ -85,17 +85,30 @@ window.jsonFlickrApi = function(rsp) {
         var url = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_m.jpg' ].join('');    
         var id = p.id;
         
-        //http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&id=8447950504&format=json
-
+        //
+		
+		
+		
+		var url2 = "http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&id="+ "13349096525"
+		var url2 = 	"https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&" + 					"api_key=9435cba1ab14ddbd96be488aa462471f&" + 						
+					"photo_id="+ p.id +"&" + 						
+					"format=json&nojsoncallback=1" 
+					//+ "&auth_token=72157642783869434-9cfd66bfebc270a5&api_sig=5b78568f6038fcc29a50cfe45f0c8fce"
+		
+				
+		$.get(url2, function(data){
+		  alert( data.photo.description._content );
+		});		
+		
         
-        features.push({"geometry":{
+		features.push({"geometry":{
         				"type": "Point", 
         				"coordinates": [p.longitude, p.latitude]},
-        			"properties":{
+        				"properties":{
         				"img": thumb, 
         				"image": url, 
         				"name":p.title, 
-        				"description": "description"}
+        				"description": p.description}
         			});
     }
 
@@ -188,9 +201,9 @@ var script = document.createElement('script');
 script.src = 'http://api.flickr.com/services/rest/?'+
                'method=flickr.photos.search&'+
                'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
-               'user_id=92325211@N08&'+ 
+			   'user_id=92325211@N08&'+ 
                //'min_upload_date='+ date +'&'+
-               //'tags=clouds&'+
+			   'tags=recyclemaptimcastelijnnl&'+
                'extras=geo&' +
                'has_geo=1&'+
                'format=json';
