@@ -5,6 +5,8 @@
   <script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'></script>
   <script src='https://raw.github.com/timrwood/moment/1.7.2/min/moment.min.js'></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+ 
   <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' />
 
   <style>
@@ -75,122 +77,111 @@ map.zoom(12).center({ lat: 52.1, lon: 5.07 });
 var features = [];
 var number;
 
+geocoder = new google.maps.Geocoder();
+
 window.jsonFlickrApi = function(rsp) {
 
     var photos = rsp.photos.photo;
-    for (var i = 0; i < photos.length; i++) {
-        var p = photos[i];
-        
-        var thumb = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_s.jpg' ].join('');            
-        var url = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_m.jpg' ].join('');    
-        var id = p.id;
-        
-        //
-		
-		
-		
-		var url2 = "http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&id="+ "13349096525"
-		var url2 = 	"https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&" + 					"api_key=9435cba1ab14ddbd96be488aa462471f&" + 						
-					"photo_id="+ p.id +"&" + 						
-					"format=json&nojsoncallback=1" 
-					//+ "&auth_token=72157642783869434-9cfd66bfebc270a5&api_sig=5b78568f6038fcc29a50cfe45f0c8fce"
-		
-				
-		$.get(url2, function(data){
-		  alert( data.photo.description._content );
-		});		
-		
-        
-		features.push({"geometry":{
-        				"type": "Point", 
-        				"coordinates": [p.longitude, p.latitude]},
-        				"properties":{
-        				"img": thumb, 
-        				"image": url, 
-        				"name":p.title, 
-        				"description": p.description}
-        			});
-    }
-
-	
-
-	var stringJson = JSON.stringify(features);
-	
-	var markers = mapbox.markers.layer().features(features).factory(function(f) {
-    // Define a new factory function. This takes a GeoJSON object
-    // as its input and returns an element - in this case an image -
-    // that represents the point.
-        var img = document.createElement('img');
-        img.className = 'marker-image';
-        img.setAttribute('src', f.properties.img);
-        return img;
-    });
-    //*/
     
-	var interaction = mapbox.markers.interaction(markers);
-	mapbox.markers.interaction(markers);
-	
-	function intialize()
-	{
-	    number = photos.length;
-	    return number;
-	}
-
-	map.addLayer(markers);
-      	  
-
-	/* this makes the map zoom to
-	if (photos.length>0)
-	  {
-	     map.addLayer(markers)
-      	  .setExtent(markers.extent());
-      	  if(photos.length<2){map.zoom(12);}
-        
-	  }
-	else
-		{
-			map.zoom(12).center({ lat: 52.1, lon: 5.07 });
+	function get_entries(callback){
+		var features =[];
+		var j=0;
+		for (var i = 0; i < photos.length; i++) {
+		  // function to make a copy of i as it will always be the last at time of the callbacl
+		  (function (i_copy) {
+			var p = photos[i];
+        	
+			//get photo/thumbnail url
+        	var thumb = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_s.jpg' ].join('');            
+        	var url = [ 'http://farm', p.farm, '.static.flickr.com/', p.server, '/', p.id, '_', p.secret, '_m.jpg' ].join('');    
+        	var id = p.id;
+			
+			//construct property url
+			var url2 = 	"https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&" + 						"api_key=9435cba1ab14ddbd96be488aa462471f&" + 						
+			 			"photo_id="+ p.id +"&" + 						
+			 			"format=json&nojsoncallback=1"; 
+			
+			// get photo info and store as map feature			
+			$.get( url2, function(data){
+				features.push({"geometry":{
+		        					"type": "Point", 
+		        					"coordinates": [p.longitude, p.latitude]
+								},
+		        				"properties":{
+		        					"img": thumb, 
+		        					"image": url, 
+		        					"name":p.title, 
+		        					"description": data.photo.description._content
+								}
+		        			});
+				
+				//at the end of the call the callback and pass the result	
+				if(j == photos.length-1){
+					callback(features);
+				}	
+				j = j +1
+								
+			});				
+		  })(i)	
 		}
- 	*/
-	// Set a custom formatter for tooltips
-	// Provide a function that returns html to be used in tooltip
-	interaction.formatter(function(feature) {
-	    var o = '<a target="_blank" href="' + feature.properties.image + '">' +
-	        '<img src="' + feature.properties.image + '">' +
-	        '<p>' + feature.properties.name + '</p>' +
-	        '</a>' +
-	        '<p>' + feature.properties.description +'</p>';
-	    return o;
+	}
+	
+	//add markers to map
+	get_entries(function(features){
+						
+		for(i=0; i<features.length;i++){
+			console.log( features[i].properties.image);
+		}
+						
+			var markers = mapbox.markers.layer().features(features).factory(function(f) {
+		    // Define a new factory function. This takes a GeoJSON object
+		    // as its input and returns an element - in this case an image -
+		    // that represents the point.
+		        var img = document.createElement('img');
+		        img.className = 'marker-image';
+		        img.setAttribute('src', f.properties.img);
+		        return img;
+		    });		
+			
+			var interaction = mapbox.markers.interaction(markers);
+			mapbox.markers.interaction(markers);
+
+
+			map.addLayer(markers);
+			
+			// Set a custom formatter for tooltips
+			// Provide a function that returns html to be used in tooltip
+			interaction.formatter(function(feature) {
+			    var o = '<a target="_blank" href="' + feature.properties.image + '">' +
+			        '<img src="' + feature.properties.image + '">' +
+			        '<p>' + feature.properties.name + '</p>' +
+			        '</a>' +
+			        '<p>' + feature.properties.description +'</p>';
+			    return o;
+			});
 	});
 
+}
 
-
+function codeLatLng(lat, lng) {
+  var latlng = new google.maps.LatLng(lat, lng);
+  var result;
+  geocoder.geocode({'latLng': latlng}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      if (results[1]) {
+		alert( results[1].formatted_address );
+      } else {
+        alert('No results found');
+      }
+    } else {
+      alert('Geocoder failed due to: ' + status);
+    }
+  });
+  return result
 }
 
 
 
-/*
-function httpGet(theUrl)
-    {
-    var xmlHttp = null;
-
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", theUrl, false );
-    xmlHttp.send( null );
-    return xmlHttp.responseText;
-}
-
-var stringJson = httpGet('http://api.flickr.com/services/rest/?'+
-               'method=flickr.photos.search&'+
-               'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
-               'user_id=92325211@N08&'+ 
-               'min_upload_date='+ date +'&'+
-               //'tags=clouds&'+
-               'extras=geo&' +
-               'has_geo=1&'+
-               'format=json')
-console.log(stringJson);
-*/
 
 var date = moment().subtract('days', 3).format('YYYY-MM-DD');
 //moment().subtract('days', 10).calendar();
@@ -203,7 +194,7 @@ script.src = 'http://api.flickr.com/services/rest/?'+
                'api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&'+
 			   'user_id=92325211@N08&'+ 
                //'min_upload_date='+ date +'&'+
-			   'tags=recyclemaptimcastelijnnl&'+
+			   //'tags=recyclemaptimcastelijnnl&'+
                'extras=geo&' +
                'has_geo=1&'+
                'format=json';
