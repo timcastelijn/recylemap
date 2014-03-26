@@ -5,7 +5,6 @@
   <script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.js'></script>
   <script src='https://raw.github.com/timrwood/moment/1.7.2/min/moment.min.js'></script>
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.min.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
  
   <link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.7/mapbox.css' rel='stylesheet' ></link>
   <link href='stylesheet.css' rel='stylesheet'></link>
@@ -52,7 +51,6 @@ map.zoom(12).center({ lat: 52.1, lon: 5.07 });
 var features = [];
 var number;
 
-geocoder = new google.maps.Geocoder();
 
 window.jsonFlickrApi = function(rsp) {
 
@@ -72,14 +70,15 @@ window.jsonFlickrApi = function(rsp) {
         	var id = p.id;
 			
 			//construct property url
-			var url2 = 	"https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&" + 						"api_key=9435cba1ab14ddbd96be488aa462471f&" + 						
+			var url2 = 	"https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&" + 						"api_key=a08b5f6454d8e7c77c2fd5f75cf4b72e&" + 						
 			 			"photo_id="+ p.id +"&" + 						
 			 			"format=json&nojsoncallback=1"; 
 			
 			// get photo info and store as map feature			
 			$.get( url2, function(data){
+				console.log(data);
 				$.get( "http://api.tiles.mapbox.com/v3/examples.map-zr0njcqy/geocode/"+ p.longitude+ ","+p.latitude +".json", function(data2){
-					console.log(data2.results[0]);
+					// console.log(data2.results[0]);
 					
 					var street = data2.results[0][0].name
 					var city = data2.results[0][1].name
@@ -142,22 +141,6 @@ window.jsonFlickrApi = function(rsp) {
 
 }
 
-function codeLatLng(lat, lng) {
-  var latlng = new google.maps.LatLng(lat, lng);
-  var result;
-  geocoder.geocode({'latLng': latlng}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-      if (results[1]) {
-		alert( results[1].formatted_address );
-      } else {
-        alert('No results found');
-      }
-    } else {
-      alert('Geocoder failed due to: ' + status);
-    }
-  });
-  return result
-}
 
 
 
